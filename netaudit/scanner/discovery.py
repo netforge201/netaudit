@@ -1,0 +1,135 @@
+"""Host discovery: combines ICMP reachability, ARP/MAC and optional port
+checks into a single concurrent network scan.
+"""
+from __future__ import annotations
+
+import ipaddress
+import socket
+import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from dataclasses import dataclass, field
+
+from netaudit.scanner.arp import SCAPY_AVAILABLE, lookup_mac
+from netaudit.scanner.icmp import quick_probe
+from netaudit.scanner.tcp import PortResult, scan_ports
+
+# Minimal, best-effort OUI-prefix -> vendor table for common networking
+# and computer vendors. Not exhaustive; unknown prefixes report "Unknown".
+_OUI_VENDORS: dict[str, str] = {
+    "00:1A:2B": "Cisco Systems", "00:0C:29": "VMware", "00:50:56": "VMware",
+    "00:1C:42": "Parallels", "3C:5A:B4": "Google", "F4:5C:89": "Apple",
+    "AC:DE:48": "Apple", "00:1E:C2": "Apple", "B8:27:EB": "Raspberry Pi",
+    "DC:A6:32": "Raspberry Pi", "E4:5F:01": "Raspberry Pi",
+    "00:16:3E": "Xen", "08:00:27": "VirtualBox", "52:54:00": "QEMU/KVM",
+    "00:15:5D": "Microsoft Hyper-V", "00:E0:4C": "Realtek",
+    "00:11:32": "Synology", "00:1B:63": "Apple", "F0:9F:C2": "Ubiquiti",
+    "24:A4:3C": "Ubiquiti", "44:D9:E7": "Ubiquiti", "00:23:69": "Cisco Systems",
+}
+
+
+def vendor_from_mac(mac: str | None) -> str | None:
+    """Best-effort vendor lookup from a MAC OUI prefix. Returns None if unknown."""
+    if not mac:
+        return None
+    prefix = mac.upper()[:8]
+    return _OUI_VENDORS.get(prefix)
+
+
+@dataclass
+class HostResult:
+    ip: str
+    status: str  # "up" | "down"
+    latency_ms: float | None
+    hostname: str | None
+    mac: str | None
+    vendor: str | None
+    open_ports: list[PortResult] = field(default_factory=list)
+
+
+def resolve_hostname(ip: str) -> str | None:
+    try:
+        return socket.gethostbyaddr(ip)[0]
+    except (socket.herror, socket.gaierror, OSError):
+        return None
+
+
+def probe_host(
+    ip: str,
+    timeout: float,
+    ports: list[int] | None,
+    resolve_dns: bool = True,
+    resolve_mac: bool = True,
+) -> HostResult:
+    """Probe a single host: ICMP reachability, optional DNS/MAC/ports."""
+    result = quick_probe(ip, timeout=timeout)
+
+    hostname = resolve_hostname(ip) if resolve_dns and result.reachable else None
+    mac = lookup_mac(ip, timeout=timeout) if resolve_mac and SCAPY_AVAILABLE else None
+    vendor = vendor_from_mac(mac)
+
+    open_ports: list[PortResult] = []
+    if result.reachable and ports:
+        scanned = scan_ports(ip, ports, timeout=timeout, workers=min(len(ports), 20))
+        open_ports = [p for p in scanned if p.state == "open"]
+
+    return HostResult(
+        ip=ip,
+        status="up" if result.reachable else "down",
+        latency_ms=result.avg_ms,
+        hostname=hostname,
+        mac=mac,
+        vendor=vendor,
+        open_ports=open_ports,
+    )
+
+
+@dataclass
+class ScanSummary:
+    hosts: list[HostResult]
+    discovered: int
+    online: int
+    offline: int
+    duration_s: float
+
+
+def scan_network(
+    network: ipaddress.IPv4Network | ipaddress.IPv6Network,
+    timeout: float = 1.0,
+    workers: int = 50,
+    ports: list[int] | None = None,
+    progress_callback=None,
+) -> ScanSummary:
+    """Scan every usable host address in ``network`` concurrently."""
+    addresses = [str(ip) for ip in network.hosts()]
+    if not addresses:
+        addresses = [str(network.network_address)]
+
+    start = time.monotonic()
+    results: dict[str, HostResult] = {}
+    with ThreadPoolExecutor(max_workers=max(1, min(workers, len(addresses)))) as pool:
+        futures = {
+            pool.submit(probe_host, ip, timeout, ports): ip for ip in addresses
+        }
+        completed = 0
+        for future in as_completed(futures):
+            ip = futures[future]
+            try:
+                results[ip] = future.result()
+            except Exception:
+                results[ip] = HostResult(ip=ip, status="down", latency_ms=None,
+                                          hostname=None, mac=None, vendor=None)
+            completed += 1
+            if progress_callback:
+                progress_callback(completed, len(addresses))
+
+    ordered = [results[ip] for ip in addresses]
+    online = sum(1 for h in ordered if h.status == "up")
+    duration = time.monotonic() - start
+
+    return ScanSummary(
+        hosts=ordered,
+        discovered=len(ordered),
+        online=online,
+        offline=len(ordered) - online,
+        duration_s=round(duration, 2),
+    )

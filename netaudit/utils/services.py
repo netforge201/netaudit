@@ -1,0 +1,27 @@
+"""Well-known TCP port/service name data (no third-party dependencies)."""
+from __future__ import annotations
+
+COMMON_TCP_PORTS: list[int] = [
+    21, 22, 23, 25, 53, 80, 110, 139, 143, 443,
+    445, 3306, 3389, 5432, 5900, 8080, 8443,
+]
+
+SERVICE_NAMES: dict[int, str] = {
+    20: "FTP-DATA", 21: "FTP", 22: "SSH", 23: "TELNET", 25: "SMTP",
+    53: "DNS", 67: "DHCP", 68: "DHCP", 69: "TFTP", 80: "HTTP",
+    110: "POP3", 111: "RPCBIND", 123: "NTP", 135: "MSRPC",
+    139: "NETBIOS", 143: "IMAP", 161: "SNMP", 162: "SNMPTRAP",
+    179: "BGP", 389: "LDAP", 443: "HTTPS", 445: "SMB",
+    465: "SMTPS", 514: "SYSLOG", 515: "LPD", 587: "SUBMISSION",
+    631: "IPP", 636: "LDAPS", 993: "IMAPS", 995: "POP3S",
+    1433: "MSSQL", 1521: "ORACLE", 2049: "NFS", 3000: "DEV-HTTP",
+    3306: "MYSQL", 3389: "RDP", 5000: "DEV-HTTP", 5432: "POSTGRESQL",
+    5900: "VNC", 5985: "WINRM", 6379: "REDIS", 8000: "HTTP-ALT",
+    8080: "HTTP-PROXY", 8443: "HTTPS-ALT", 9200: "ELASTICSEARCH",
+    27017: "MONGODB",
+}
+
+
+def service_name(port: int) -> str:
+    """Return a best-effort well-known service name for ``port``."""
+    return SERVICE_NAMES.get(port, "UNKNOWN")

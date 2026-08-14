@@ -1,0 +1,30 @@
+# Copy to ~/.netaudit/config.yaml (or run `netaudit config init`)
+defaults:
+  timeout: 2
+  workers: 50
+
+scanner:
+  default_ports:
+    - 21
+    - 22
+    - 23
+    - 25
+    - 53
+    - 80
+    - 110
+    - 139
+    - 143
+    - 443
+    - 445
+    - 3306
+    - 3389
+    - 5432
+    - 5900
+    - 8080
+    - 8443
+
+reports:
+  directory: ./reports
+
+snapshots:
+  directory: ./snapshots
