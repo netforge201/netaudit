@@ -77,12 +77,12 @@ def parse_bgp_summary(raw: str) -> tuple[int, int] | None:
         return None
     lines = raw.splitlines()
     neighbor_lines = [
-        l for l in lines
-        if re.match(r"^\d+\.\d+\.\d+\.\d+\s", l.strip())
+        line for line in lines
+        if re.match(r"^\d+\.\d+\.\d+\.\d+\s", line.strip())
     ]
     if not neighbor_lines:
         return None
-    established = sum(1 for l in neighbor_lines if not re.search(r"\bIdle\b|\bActive\b|\bConnect\b", l))
+    established = sum(1 for line in neighbor_lines if not re.search(r"\bIdle\b|\bActive\b|\bConnect\b", line))
     return len(neighbor_lines), established
 
 
@@ -91,8 +91,8 @@ def parse_ospf_neighbors(raw: str) -> tuple[int, int] | None:
     lowered = raw.lower()
     if "% invalid" in lowered or "% unknown" in lowered or "ospf process" not in lowered and "neighbor id" not in lowered:
         return None
-    lines = [l for l in raw.splitlines() if re.match(r"^\d+\.\d+\.\d+\.\d+\s", l.strip())]
+    lines = [line for line in raw.splitlines() if re.match(r"^\d+\.\d+\.\d+\.\d+\s", line.strip())]
     if not lines:
         return None
-    full = sum(1 for l in lines if "full" in l.lower())
+    full = sum(1 for line in lines if "full" in line.lower())
     return len(lines), full

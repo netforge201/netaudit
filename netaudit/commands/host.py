@@ -32,14 +32,14 @@ def host(
         validate_target(target)
     except ValidationError as exc:
         err_console.print(f"[bold red]Error:[/bold red] {exc}")
-        raise typer.Exit(code=2)
+        raise typer.Exit(code=2) from None
 
     # Resolve to IP if a hostname was given
     try:
         ip = socket.gethostbyname(target)
     except socket.gaierror as exc:
         err_console.print(f"[bold red]Error:[/bold red] Could not resolve '{target}': {exc}")
-        raise typer.Exit(code=3)
+        raise typer.Exit(code=3) from None
 
     ping_result = ping(ip, count=4, timeout=timeout)
 

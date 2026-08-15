@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import getpass
 import os
+from contextlib import suppress
 from dataclasses import dataclass
 
 try:
@@ -160,8 +161,6 @@ class device_session:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         if self.connection is not None:
-            try:
+            with suppress(Exception):
                 self.connection.disconnect()
-            except Exception:  # noqa: BLE001 - best-effort cleanup
-                pass
         return False

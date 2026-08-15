@@ -27,7 +27,7 @@ def dns(
                 print_json({"target": target, "error": str(exc)})
             else:
                 err_console.print(f"[bold red]Error:[/bold red] {exc}")
-            raise typer.Exit(code=3)
+            raise typer.Exit(code=3) from None
 
         if json_output:
             print_json({"target": target, "ptr": name})

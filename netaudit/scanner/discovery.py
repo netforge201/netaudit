@@ -111,14 +111,13 @@ def scan_network(
             pool.submit(probe_host, ip, timeout, ports): ip for ip in addresses
         }
         completed = 0
-        for future in as_completed(futures):
+        for completed, future in enumerate(as_completed(futures), start=1):
             ip = futures[future]
             try:
                 results[ip] = future.result()
             except Exception:
                 results[ip] = HostResult(ip=ip, status="down", latency_ms=None,
                                           hostname=None, mac=None, vendor=None)
-            completed += 1
             if progress_callback:
                 progress_callback(completed, len(addresses))
 

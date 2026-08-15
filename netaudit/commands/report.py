@@ -30,13 +30,13 @@ def report(
     in_path = Path(input_file)
     if not in_path.exists():
         err_console.print(f"[bold red]Error:[/bold red] File not found: {input_file}")
-        raise typer.Exit(code=1)
+        raise typer.Exit(code=1) from None
 
     try:
         data = json.loads(in_path.read_text(encoding="utf-8"))
     except json.JSONDecodeError as exc:
         err_console.print(f"[bold red]Error:[/bold red] Invalid JSON in {input_file}: {exc}")
-        raise typer.Exit(code=1)
+        raise typer.Exit(code=1) from None
 
     is_scan = isinstance(data, dict) and "hosts" in data and "discovered" in data
     stem = in_path.stem
@@ -47,7 +47,7 @@ def report(
             f"[bold red]Error:[/bold red] Unsupported format '{format}'. "
             "Choose from: json, csv, markdown, html"
         )
-        raise typer.Exit(code=2)
+        raise typer.Exit(code=2) from None
 
     ext = {"json": "json", "csv": "csv", "markdown": "md", "html": "html"}[format]
     out_path = Path(output) if output else Path("reports") / f"{stem}.{ext}"
@@ -64,7 +64,7 @@ def report(
                 "[bold red]Error:[/bold red] CSV output requires list-shaped or "
                 "scan-shaped JSON data."
             )
-            raise typer.Exit(code=2)
+            raise typer.Exit(code=2) from None
         write_csv_report(rows, out_path)
     elif format == "markdown":
         content = scan_to_markdown(data) if is_scan else generic_to_markdown(stem, data)

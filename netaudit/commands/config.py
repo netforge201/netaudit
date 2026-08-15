@@ -32,5 +32,5 @@ def init(force: bool = typer.Option(False, "--force", help="Overwrite existing c
         path = init_config(force=force)
     except FileExistsError as exc:
         err_console.print(f"[bold red]Error:[/bold red] {exc}. Use --force to overwrite.")
-        raise typer.Exit(code=1)
+        raise typer.Exit(code=1) from None
     console.print(f"[bold green]Config written[/bold green]: {path}")

@@ -29,16 +29,16 @@ def scan(
     try:
         network = parse_cidr(target)
     except ValidationError as exc:
-        err_console.print(f"[bold red]Error:[/bold red] {exc}")
-        raise typer.Exit(code=2)
+        err_console.print(f"Error: {exc}", markup=False, crop=False, overflow="ignore", no_wrap=True)
+        raise typer.Exit(code=2) from None
 
     port_list = None
     if ports:
         try:
             port_list = parse_ports(ports).ports
         except ValidationError as exc:
-            err_console.print(f"[bold red]Error:[/bold red] {exc}")
-            raise typer.Exit(code=2)
+            err_console.print(f"Error: {exc}", markup=False, crop=False, overflow="ignore", no_wrap=True)
+            raise typer.Exit(code=2) from None
 
     show_progress = not quiet and not json_output and not csv_output
 

@@ -37,8 +37,8 @@ def diff_text(old_lines: list[str], new_lines: list[str]) -> tuple[list[str], li
     Lines are compared after stripping whitespace; order is not considered
     significant for 'show' command output like interface/ARP tables.
     """
-    old_set = {l.strip() for l in old_lines if l.strip()}
-    new_set = {l.strip() for l in new_lines if l.strip()}
+    old_set = {line.strip() for line in old_lines if line.strip()}
+    new_set = {line.strip() for line in new_lines if line.strip()}
     added = sorted(new_set - old_set)
     removed = sorted(old_set - new_set)
     return added, removed

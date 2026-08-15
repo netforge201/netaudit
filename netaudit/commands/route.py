@@ -24,7 +24,7 @@ def route(
         validate_target(target)
     except ValidationError as exc:
         err_console.print(f"[bold red]Error:[/bold red] {exc}")
-        raise typer.Exit(code=2)
+        raise typer.Exit(code=2) from None
 
     result = traceroute(target, max_hops=max_hops, timeout=timeout)
 
@@ -33,7 +33,7 @@ def route(
             print_json({"target": target, "error": result.error})
         else:
             err_console.print(f"[bold red]Error:[/bold red] {result.error}")
-        raise typer.Exit(code=3)
+        raise typer.Exit(code=3) from None
 
     if json_output:
         print_json(result)

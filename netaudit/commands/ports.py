@@ -31,14 +31,14 @@ def ports(
         validate_target(target)
     except ValidationError as exc:
         err_console.print(f"[bold red]Error:[/bold red] {exc}")
-        raise typer.Exit(code=2)
+        raise typer.Exit(code=2) from None
 
     spec = ports_opt or range_opt
     try:
         port_list = parse_ports(spec).ports if spec else list(COMMON_TCP_PORTS)
     except ValidationError as exc:
         err_console.print(f"[bold red]Error:[/bold red] {exc}")
-        raise typer.Exit(code=2)
+        raise typer.Exit(code=2) from None
 
     results = scan_ports(target, port_list, timeout=timeout, workers=workers)
 

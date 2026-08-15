@@ -35,7 +35,7 @@ def connect(
         validate_target(target)
     except ValidationError as exc:
         err_console.print(f"[bold red]Error:[/bold red] {exc}")
-        raise typer.Exit(code=2)
+        raise typer.Exit(code=2) from None
 
     try:
         creds = resolve_credentials(username, password)
@@ -43,13 +43,13 @@ def connect(
             pass
     except MissingDependencyError as exc:
         err_console.print(f"[bold red]Error:[/bold red] {exc}")
-        raise typer.Exit(code=1)
+        raise typer.Exit(code=1) from None
     except DeviceAuthenticationError as exc:
         err_console.print(f"[bold red]Authentication failed:[/bold red] {exc}")
-        raise typer.Exit(code=4)
+        raise typer.Exit(code=4) from None
     except DeviceConnectionError as exc:
         err_console.print(f"[bold red]Connection failed:[/bold red] {exc}")
-        raise typer.Exit(code=3)
+        raise typer.Exit(code=3) from None
 
     console.print(f"[bold green]Connected successfully[/bold green] to {target} "
                   f"({device_type}).")
@@ -78,7 +78,7 @@ def info(
         validate_target(target)
     except ValidationError as exc:
         err_console.print(f"[bold red]Error:[/bold red] {exc}")
-        raise typer.Exit(code=2)
+        raise typer.Exit(code=2) from None
 
     try:
         creds = resolve_credentials(username, password)
@@ -87,13 +87,13 @@ def info(
             output = module.collect_info(conn)
     except MissingDependencyError as exc:
         err_console.print(f"[bold red]Error:[/bold red] {exc}")
-        raise typer.Exit(code=1)
+        raise typer.Exit(code=1) from None
     except DeviceAuthenticationError as exc:
         err_console.print(f"[bold red]Authentication failed:[/bold red] {exc}")
-        raise typer.Exit(code=4)
+        raise typer.Exit(code=4) from None
     except DeviceConnectionError as exc:
         err_console.print(f"[bold red]Connection failed:[/bold red] {exc}")
-        raise typer.Exit(code=3)
+        raise typer.Exit(code=3) from None
 
     if json_output:
         print_json({"target": target, "device_type": device_type, "sections": output})

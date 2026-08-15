@@ -24,14 +24,14 @@ def ping(
         validate_target(target)
     except ValidationError as exc:
         err_console.print(f"[bold red]Error:[/bold red] {exc}")
-        raise typer.Exit(code=2)
+        raise typer.Exit(code=2) from None
 
     result = do_ping(target, count=count, timeout=timeout, interval=interval)
 
     if json_output:
         print_json(result)
         if not result.reachable:
-            raise typer.Exit(code=3)
+            raise typer.Exit(code=3) from None
         return
 
     console.print(f"\n[bold]PING {target}[/bold]\n")
@@ -50,4 +50,4 @@ def ping(
         console.print(f"[bold]Max:[/bold] {result.max_ms} ms")
 
     if not result.reachable:
-        raise typer.Exit(code=3)
+        raise typer.Exit(code=3) from None

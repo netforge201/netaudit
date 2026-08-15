@@ -121,11 +121,11 @@ def main(
 
     if version:
         console.print(f"netaudit {__version__}")
-        raise typer.Exit(code=0)
+        raise typer.Exit(code=0) from None
 
     if ctx.invoked_subcommand is None:
         _print_banner()
-        raise typer.Exit(code=0)
+        raise typer.Exit(code=0) from None
 
 
 @app.command("version", help="Show the NetAudit version.")
@@ -141,7 +141,7 @@ def run() -> None:
     try:
         app()
     except ValidationError as exc:
-        err_console.print(f"[bold red]Error:[/bold red] {exc}")
+        err_console.print(f"[bold red]Error:[/bold red] {exc}", crop=False, overflow="ignore", no_wrap=True)
         sys.exit(2)
     except KeyboardInterrupt:
         err_console.print("\n[yellow]Interrupted.[/yellow]")

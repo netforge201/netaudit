@@ -25,7 +25,7 @@ def diff(
         validate_target(target)
     except ValidationError as exc:
         err_console.print(f"[bold red]Error:[/bold red] {exc}")
-        raise typer.Exit(code=2)
+        raise typer.Exit(code=2) from None
 
     snaps = latest_snapshots(Path(directory), target, count=2)
     if len(snaps) < 2:
@@ -33,7 +33,7 @@ def diff(
             f"[bold red]Error:[/bold red] Need at least 2 snapshots for '{target}' "
             f"to diff, found {len(snaps)}. Run 'netaudit snapshot {target}' first."
         )
-        raise typer.Exit(code=1)
+        raise typer.Exit(code=1) from None
 
     new_path, old_path = snaps[0], snaps[1]
     old_files = load_snapshot(old_path)
