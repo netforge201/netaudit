@@ -5,10 +5,15 @@ end. Anything that would touch the real network is mocked.
 """
 from __future__ import annotations
 
+import re
 from unittest.mock import patch
 
 from netaudit import __version__
 from netaudit.cli import app
+
+
+def plain(text: str) -> str:
+    return re.sub(r"\x1b\[[0-9;]*m", "", text)
 
 
 def test_version_flag(cli_runner):
@@ -39,13 +44,13 @@ def test_help_flag(cli_runner):
 def test_scan_help(cli_runner):
     result = cli_runner.invoke(app, ["scan", "--help"])
     assert result.exit_code == 0
-    assert "--ports" in result.output
+    assert "--ports" in plain(result.output)
 
 
 def test_ports_help(cli_runner):
     result = cli_runner.invoke(app, ["ports", "--help"])
     assert result.exit_code == 0
-    assert "--range" in result.output
+    assert "--range" in plain(result.output)
 
 
 def test_doctor_help(cli_runner):
@@ -56,7 +61,7 @@ def test_doctor_help(cli_runner):
 def test_snapshot_help(cli_runner):
     result = cli_runner.invoke(app, ["snapshot", "--help"])
     assert result.exit_code == 0
-    assert "--list" in result.output
+    assert "--list" in plain(result.output)
 
 
 def test_diff_help(cli_runner):
