@@ -123,11 +123,13 @@ The scanner combines several mechanisms rather than depending on one protocol.
 A typical result can contain:
 
 ```text
-IP              STATUS  LATENCY  HOSTNAME             MAC                  VENDOR
-192.168.1.1     UP      5.2 ms   —                    90:03:2e:a2:d6:c0   —
-192.168.1.128   UP      0.8 ms   MACBOOKPRO-4FFC      6c:40:08:ac:4f:fc   Apple
-192.168.1.133   UP      0.7 ms   —                    3a:82:e3:94:96:32   —
+IP              STATUS  LATENCY  HOSTNAME       MAC                  VENDOR
+10.0.0.1        UP      5.2 ms   router         00:11:22:33:44:55   ExampleVendor
+10.0.0.20       UP      0.8 ms   workstation    AA:BB:CC:DD:EE:FF   Apple
+10.0.0.30       UP      0.7 ms   —              12:34:56:78:9A:BC   —
 ```
+
+The values above are synthetic examples and do not represent a real network.
 
 Not every device will expose every field.
 
