@@ -1,8 +1,6 @@
 """'netaudit doctor' - comprehensive network/device health check."""
 from __future__ import annotations
 
-from typing import Optional
-
 import typer
 
 from netaudit.diagnostics.checks import CheckStatus
@@ -26,8 +24,8 @@ def doctor(
     device: bool = typer.Option(
         False, "--device", help="Also run device-level checks over SSH (requires credentials)"
     ),
-    username: Optional[str] = typer.Option(None, "--username", envvar="NETAUDIT_USERNAME"),
-    password: Optional[str] = typer.Option(None, "--password", envvar="NETAUDIT_PASSWORD"),
+    username: str | None = typer.Option(None, "--username", envvar="NETAUDIT_USERNAME"),
+    password: str | None = typer.Option(None, "--password", envvar="NETAUDIT_PASSWORD"),
     device_type: str = typer.Option("cisco_ios", "--device-type"),
     json_output: bool = typer.Option(False, "--json", help="Output as JSON"),
 ):

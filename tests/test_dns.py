@@ -74,6 +74,6 @@ def test_reverse_lookup_nxdomain_raises(mock_resolver_cls):
 
     try:
         reverse_lookup("192.0.2.123")
-        assert False, "should have raised"
+        raise AssertionError("should have raised")
     except DnsLookupError:
         pass

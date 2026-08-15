@@ -3,7 +3,6 @@ real SSH connections or credentials are needed.
 """
 from __future__ import annotations
 
-import os
 from unittest.mock import MagicMock, patch
 
 import pytest

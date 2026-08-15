@@ -7,10 +7,10 @@ device) are marked as 'skipped' rather than faked as failures.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 
 
-class CheckStatus(str, Enum):
+class CheckStatus(StrEnum):
     PASS = "pass"
     WARN = "warn"
     FAIL = "fail"

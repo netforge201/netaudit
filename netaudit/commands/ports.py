@@ -1,8 +1,6 @@
 """'netaudit ports' - TCP port scanning against a single host."""
 from __future__ import annotations
 
-from typing import Optional
-
 import typer
 from rich.table import Table
 
@@ -15,10 +13,10 @@ log = get_logger("commands.ports")
 
 def ports(
     target: str = typer.Argument(..., help="IP address or hostname"),
-    ports_opt: Optional[str] = typer.Option(
+    ports_opt: str | None = typer.Option(
         None, "--ports", help="Comma-separated ports, e.g. 22,80,443"
     ),
-    range_opt: Optional[str] = typer.Option(
+    range_opt: str | None = typer.Option(
         None, "--range", help="Port range, e.g. 1-1024"
     ),
     timeout: float = typer.Option(1.0, "--timeout", help="Per-port timeout in seconds"),

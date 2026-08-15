@@ -26,11 +26,8 @@ def check_port(host: str, port: int, timeout: float = 1.0) -> PortResult:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             sock.settimeout(timeout)
             result = sock.connect_ex((host, port))
-            if result == 0:
-                state = "open"
-            else:
-                state = "closed"
-    except socket.timeout:
+            state = "open" if result == 0 else "closed"
+    except TimeoutError:
         state = "filtered"
     except (socket.gaierror, OSError):
         state = "filtered"

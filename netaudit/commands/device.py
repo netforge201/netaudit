@@ -1,10 +1,7 @@
 """'netaudit device' - connect to and query network devices via Netmiko."""
 from __future__ import annotations
 
-from typing import Optional
-
 import typer
-from rich.table import Table
 
 from netaudit.utils.formatting import console, err_console, print_json
 from netaudit.utils.logging import get_logger
@@ -17,8 +14,8 @@ log = get_logger("commands.device")
 @app.command("connect")
 def connect(
     target: str = typer.Argument(..., help="Device IP address or hostname"),
-    username: Optional[str] = typer.Option(None, "--username", envvar="NETAUDIT_USERNAME"),
-    password: Optional[str] = typer.Option(
+    username: str | None = typer.Option(None, "--username", envvar="NETAUDIT_USERNAME"),
+    password: str | None = typer.Option(
         None, "--password", envvar="NETAUDIT_PASSWORD",
         help="Discouraged on the command line; prefer env vars or the interactive prompt."
     ),
@@ -61,8 +58,8 @@ def connect(
 @app.command("info")
 def info(
     target: str = typer.Argument(..., help="Device IP address or hostname"),
-    username: Optional[str] = typer.Option(None, "--username", envvar="NETAUDIT_USERNAME"),
-    password: Optional[str] = typer.Option(None, "--password", envvar="NETAUDIT_PASSWORD"),
+    username: str | None = typer.Option(None, "--username", envvar="NETAUDIT_USERNAME"),
+    password: str | None = typer.Option(None, "--password", envvar="NETAUDIT_PASSWORD"),
     device_type: str = typer.Option("cisco_ios", "--device-type", help="Netmiko device_type"),
     port: int = typer.Option(22, "--port", help="SSH port"),
     json_output: bool = typer.Option(False, "--json", help="Output as JSON"),

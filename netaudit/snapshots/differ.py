@@ -1,7 +1,6 @@
 """Line-based diffing between two device snapshots."""
 from __future__ import annotations
 
-import difflib
 from dataclasses import dataclass, field
 
 

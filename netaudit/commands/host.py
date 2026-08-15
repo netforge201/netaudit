@@ -1,6 +1,8 @@
 """'netaudit host' - detailed information about a single host."""
 from __future__ import annotations
 
+import contextlib
+
 import typer
 from rich.table import Table
 
@@ -42,10 +44,8 @@ def host(
     ping_result = ping(ip, count=4, timeout=timeout)
 
     hostname = None
-    try:
+    with contextlib.suppress(DnsLookupError):
         hostname = reverse_lookup(ip, timeout=timeout)
-    except DnsLookupError:
-        pass
 
     mac = lookup_mac(ip, timeout=timeout) if SCAPY_AVAILABLE else None
     vendor = vendor_from_mac(mac)

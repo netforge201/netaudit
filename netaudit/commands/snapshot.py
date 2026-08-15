@@ -12,7 +12,6 @@ entirely. Verified against Click 8.3 directly.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Optional
 
 import typer
 from rich.table import Table
@@ -25,14 +24,14 @@ log = get_logger("commands.snapshot")
 
 
 def snapshot(
-    target: Optional[str] = typer.Argument(
+    target: str | None = typer.Argument(
         None, help="Device IP/hostname to snapshot (omit when using --list)"
     ),
     list_snapshots_flag: bool = typer.Option(
         False, "--list", help="List saved snapshots instead of capturing a new one"
     ),
-    username: Optional[str] = typer.Option(None, "--username", envvar="NETAUDIT_USERNAME"),
-    password: Optional[str] = typer.Option(None, "--password", envvar="NETAUDIT_PASSWORD"),
+    username: str | None = typer.Option(None, "--username", envvar="NETAUDIT_USERNAME"),
+    password: str | None = typer.Option(None, "--password", envvar="NETAUDIT_PASSWORD"),
     device_type: str = typer.Option("cisco_ios", "--device-type"),
     port: int = typer.Option(22, "--port"),
     directory: str = typer.Option("./snapshots", "--directory", help="Snapshot storage directory"),
@@ -90,7 +89,7 @@ def snapshot(
     console.print(f"[bold green]Snapshot saved[/bold green]: {snap.path}")
 
 
-def _list_snapshots(target: Optional[str], directory: str, json_output: bool) -> None:
+def _list_snapshots(target: str | None, directory: str, json_output: bool) -> None:
     from netaudit.snapshots.manager import list_snapshots
 
     snaps = list_snapshots(Path(directory), target)

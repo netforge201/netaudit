@@ -105,7 +105,7 @@ def test_scan_options_after_argument_are_parsed(cli_runner):
         )
         assert result.exit_code == 0
         # Confirm --ports was actually parsed and passed through (4th positional arg).
-        _, kwargs_or_args = mock_scan.call_args, mock_scan.call_args.args
+        _, _kwargs_or_args = mock_scan.call_args, mock_scan.call_args.args
         assert mock_scan.call_args.args[3] == [22, 80]
 
 

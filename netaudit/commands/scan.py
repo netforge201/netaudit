@@ -1,8 +1,6 @@
 """'netaudit scan' - network discovery over a CIDR range."""
 from __future__ import annotations
 
-from typing import Optional
-
 import typer
 from rich.progress import BarColumn, Progress, TextColumn, TimeElapsedColumn
 from rich.table import Table
@@ -18,7 +16,7 @@ def scan(
     target: str = typer.Argument(..., help="CIDR network to scan, e.g. 192.168.1.0/24"),
     timeout: float = typer.Option(1.0, "--timeout", help="Per-host timeout in seconds"),
     workers: int = typer.Option(50, "--workers", help="Concurrent worker threads"),
-    ports: Optional[str] = typer.Option(
+    ports: str | None = typer.Option(
         None, "--ports", help="Also check these ports on live hosts, e.g. 22,80,443"
     ),
     json_output: bool = typer.Option(False, "--json", help="Output as JSON"),

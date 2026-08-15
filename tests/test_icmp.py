@@ -4,7 +4,7 @@ real network access or root privileges are required.
 from __future__ import annotations
 
 import subprocess
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 from netaudit.scanner.icmp import os_hint_from_ttl, ping
 
