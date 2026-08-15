@@ -1,4 +1,5 @@
 """'netaudit scan' - network discovery over a CIDR range."""
+
 from __future__ import annotations
 
 import typer
@@ -29,7 +30,9 @@ def scan(
     try:
         network = parse_cidr(target)
     except ValidationError as exc:
-        err_console.print(f"Error: {exc}", markup=False, crop=False, overflow="ignore", no_wrap=True)
+        err_console.print(
+            f"Error: {exc}", markup=False, crop=False, overflow="ignore", no_wrap=True
+        )
         raise typer.Exit(code=2) from None
 
     port_list = None
@@ -37,7 +40,9 @@ def scan(
         try:
             port_list = parse_ports(ports).ports
         except ValidationError as exc:
-            err_console.print(f"Error: {exc}", markup=False, crop=False, overflow="ignore", no_wrap=True)
+            err_console.print(
+                f"Error: {exc}", markup=False, crop=False, overflow="ignore", no_wrap=True
+            )
             raise typer.Exit(code=2) from None
 
     show_progress = not quiet and not json_output and not csv_output
@@ -60,14 +65,16 @@ def scan(
         summary = scan_network(network, timeout, workers, port_list)
 
     if json_output:
-        print_json({
-            "target": target,
-            "hosts": summary.hosts,
-            "discovered": summary.discovered,
-            "online": summary.online,
-            "offline": summary.offline,
-            "duration_s": summary.duration_s,
-        })
+        print_json(
+            {
+                "target": target,
+                "hosts": summary.hosts,
+                "discovered": summary.discovered,
+                "online": summary.online,
+                "offline": summary.offline,
+                "duration_s": summary.duration_s,
+            }
+        )
         return
 
     if csv_output:
@@ -77,11 +84,17 @@ def scan(
         writer = csv_module.writer(sys.stdout)
         writer.writerow(["ip", "status", "latency_ms", "hostname", "mac", "vendor", "open_ports"])
         for host in summary.hosts:
-            writer.writerow([
-                host.ip, host.status, host.latency_ms or "", host.hostname or "",
-                host.mac or "", host.vendor or "",
-                ";".join(str(p.port) for p in host.open_ports),
-            ])
+            writer.writerow(
+                [
+                    host.ip,
+                    host.status,
+                    host.latency_ms or "",
+                    host.hostname or "",
+                    host.mac or "",
+                    host.vendor or "",
+                    ";".join(str(p.port) for p in host.open_ports),
+                ]
+            )
         return
 
     console.print("\n[bold]NetAudit Network Scan[/bold]")
@@ -92,6 +105,8 @@ def scan(
     table.add_column("STATUS")
     table.add_column("LATENCY")
     table.add_column("HOSTNAME")
+    table.add_column("MAC")
+    table.add_column("VENDOR")
     if port_list:
         table.add_column("OPEN PORTS")
 
@@ -99,7 +114,16 @@ def scan(
         status_style = "green" if host.status == "up" else "red dim"
         latency = f"{host.latency_ms} ms" if host.latency_ms is not None else "—"
         hostname = host.hostname or "—"
-        row = [host.ip, f"[{status_style}]{host.status.upper()}[/{status_style}]", latency, hostname]
+        mac = host.mac or "—"
+        vendor = host.vendor or "—"
+        row = [
+            host.ip,
+            f"[{status_style}]{host.status.upper()}[/{status_style}]",
+            latency,
+            hostname,
+            mac,
+            vendor,
+        ]
         if port_list:
             open_ports = ",".join(str(p.port) for p in host.open_ports) or "—"
             row.append(open_ports)

@@ -5,6 +5,7 @@ most systems; shelling out to the platform's traceroute utility is
 more portable and works with the same privilege model users already
 have configured (e.g. setcap'd traceroute on Linux).
 """
+
 from __future__ import annotations
 
 import platform
@@ -93,17 +94,17 @@ def traceroute(target: str, max_hops: int = 30, timeout: float = 2.0) -> Tracero
         cmd = [binary, "-m", str(max_hops), "-w", str(timeout), target]
 
     try:
-        proc = subprocess.run(
-            cmd, capture_output=True, text=True, timeout=timeout * max_hops + 10
-        )
+        proc = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout * max_hops + 10)
     except subprocess.TimeoutExpired:
         return TracerouteResult(target, [], False, "traceroute timed out")
     except OSError as exc:
         if "operation not permitted" in str(exc).lower():
             return TracerouteResult(
-                target, [], False,
+                target,
+                [],
+                False,
                 "Permission denied. traceroute requires elevated privileges "
-                "on this system (try running with sudo)."
+                "on this system (try running with sudo).",
             )
         return TracerouteResult(target, [], False, str(exc))
 
@@ -112,12 +113,12 @@ def traceroute(target: str, max_hops: int = 30, timeout: float = 2.0) -> Tracero
         return TracerouteResult(target, [], False, f"Could not resolve host '{target}'")
     if "permission denied" in output.lower() or "operation not permitted" in output.lower():
         return TracerouteResult(
-            target, [], False,
-            "Permission denied while sending probe packets. Try running with sudo."
+            target,
+            [],
+            False,
+            "Permission denied while sending probe packets. Try running with sudo.",
         )
 
     hops = _parse_unix_output(output, max_hops)
-    reached = bool(hops) and hops[-1].address == target or any(
-        h.address == target for h in hops
-    )
+    reached = bool(hops) and hops[-1].address == target or any(h.address == target for h in hops)
     return TracerouteResult(target=target, hops=hops, reached=reached, error=None)

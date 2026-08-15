@@ -1,4 +1,5 @@
 """Tests for netaudit.network.routing (traceroute) - mocks subprocess."""
+
 from __future__ import annotations
 
 import subprocess
@@ -44,8 +45,10 @@ def test_traceroute_binary_missing(mock_system, mock_which):
 
 @patch("netaudit.network.routing.shutil.which", return_value="/usr/bin/traceroute")
 @patch("netaudit.network.routing.platform.system", return_value="Linux")
-@patch("netaudit.network.routing.subprocess.run",
-       side_effect=subprocess.TimeoutExpired("traceroute", 5))
+@patch(
+    "netaudit.network.routing.subprocess.run",
+    side_effect=subprocess.TimeoutExpired("traceroute", 5),
+)
 def test_traceroute_timeout(mock_run, mock_system, mock_which):
     result = traceroute("8.8.8.8")
     assert result.error is not None

@@ -1,6 +1,7 @@
 """Tests for netaudit.network.dns - mocks dns.resolver so no real DNS
 queries are made.
 """
+
 from __future__ import annotations
 
 from unittest.mock import MagicMock, patch

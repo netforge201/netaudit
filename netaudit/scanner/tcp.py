@@ -4,6 +4,7 @@ Uses plain ``socket.connect`` (a "connect scan") rather than raw SYN
 packets, so it works without elevated privileges. This is slower than
 a SYN scan but portable and dependency-free.
 """
+
 from __future__ import annotations
 
 import socket

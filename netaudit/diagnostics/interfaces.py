@@ -5,6 +5,7 @@ target for Netmiko-based tooling). For other platforms, if the output
 doesn't match expected patterns, checks are marked as skipped rather
 than guessed at.
 """
+
 from __future__ import annotations
 
 import re
@@ -44,18 +45,18 @@ def parse_ios_interfaces_brief(raw: str) -> list[InterfaceStatus]:
             continue
         match = _BRIEF_LINE_RE.match(line)
         if match:
-            results.append(InterfaceStatus(
-                name=match.group("name"),
-                status=match.group("status").lower(),
-                protocol=match.group("protocol").lower(),
-            ))
+            results.append(
+                InterfaceStatus(
+                    name=match.group("name"),
+                    status=match.group("status").lower(),
+                    protocol=match.group("protocol").lower(),
+                )
+            )
     return results
 
 
 _IFACE_BLOCK_RE = re.compile(r"^(\S+) is (.+?), line protocol is (\w+)", re.MULTILINE)
-_ERROR_LINE_RE = re.compile(
-    r"(\d+)\s+input errors.*?(\d+)\s+CRC", re.IGNORECASE
-)
+_ERROR_LINE_RE = re.compile(r"(\d+)\s+input errors.*?(\d+)\s+CRC", re.IGNORECASE)
 _OUTPUT_ERROR_RE = re.compile(r"(\d+)\s+output errors", re.IGNORECASE)
 
 
@@ -73,10 +74,12 @@ def parse_ios_interface_errors(raw: str) -> list[InterfaceErrorStats]:
         input_errors = int(in_err_match.group(1)) if in_err_match else 0
         crc_errors = int(in_err_match.group(2)) if in_err_match else 0
         output_errors = int(out_err_match.group(1)) if out_err_match else 0
-        results.append(InterfaceErrorStats(
-            name=name,
-            input_errors=input_errors,
-            output_errors=output_errors,
-            crc_errors=crc_errors,
-        ))
+        results.append(
+            InterfaceErrorStats(
+                name=name,
+                input_errors=input_errors,
+                output_errors=output_errors,
+                crc_errors=crc_errors,
+            )
+        )
     return results

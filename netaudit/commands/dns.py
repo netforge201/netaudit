@@ -1,4 +1,5 @@
 """'netaudit dns' - forward and reverse DNS lookups."""
+
 from __future__ import annotations
 
 import typer

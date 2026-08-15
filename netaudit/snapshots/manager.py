@@ -1,4 +1,5 @@
 """Snapshot creation/listing/loading for device state over time."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass

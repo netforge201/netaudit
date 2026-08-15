@@ -4,6 +4,7 @@ Used as a fallback when the device type cannot be determined, or was
 explicitly set to 'generic'. Only issues the bare minimum commonly
 supported read-only commands.
 """
+
 from __future__ import annotations
 
 DEVICE_TYPE = "generic"

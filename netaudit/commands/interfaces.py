@@ -1,4 +1,5 @@
 """'netaudit interfaces' - local network interface listing."""
+
 from __future__ import annotations
 
 import typer

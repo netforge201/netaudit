@@ -4,6 +4,7 @@ Kept separate from ``utils.formatting`` so that modules which only need
 JSON conversion (e.g. report generators) don't pull in a Rich console
 dependency.
 """
+
 from __future__ import annotations
 
 import json

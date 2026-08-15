@@ -1,4 +1,5 @@
 """'netaudit ping' - ICMP reachability check."""
+
 from __future__ import annotations
 
 import typer

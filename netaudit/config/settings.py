@@ -10,6 +10,7 @@ Credentials (username/password) are NEVER read from the config file -
 only from environment variables, a ``.env`` file, or an interactive
 prompt (see ``netaudit.devices.connector``).
 """
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -61,8 +62,25 @@ class DefaultsConfig(BaseModel):
 
 class ScannerConfig(BaseModel):
     default_ports: list[int] = Field(
-        default_factory=lambda: [21, 22, 23, 25, 53, 80, 110, 139, 143,
-                                  443, 445, 3306, 3389, 5432, 5900, 8080, 8443]
+        default_factory=lambda: [
+            21,
+            22,
+            23,
+            25,
+            53,
+            80,
+            110,
+            139,
+            143,
+            443,
+            445,
+            3306,
+            3389,
+            5432,
+            5900,
+            8080,
+            8443,
+        ]
     )
 
 

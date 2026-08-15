@@ -1,4 +1,5 @@
 """Arista EOS read-only command set."""
+
 from __future__ import annotations
 
 DEVICE_TYPE = "arista_eos"

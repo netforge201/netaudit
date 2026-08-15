@@ -3,6 +3,7 @@
 These use static, realistic sample output - no live device or network
 access required.
 """
+
 from __future__ import annotations
 
 from netaudit.diagnostics import services as svc

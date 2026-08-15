@@ -1,4 +1,5 @@
 """Markdown report generation."""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -6,8 +7,7 @@ from typing import Any
 
 
 def _table(headers: list[str], rows: list[list[str]]) -> str:
-    lines = ["| " + " | ".join(headers) + " |",
-             "| " + " | ".join(["---"] * len(headers)) + " |"]
+    lines = ["| " + " | ".join(headers) + " |", "| " + " | ".join(["---"] * len(headers)) + " |"]
     for row in rows:
         lines.append("| " + " | ".join(str(c) for c in row) + " |")
     return "\n".join(lines)
@@ -19,12 +19,14 @@ def scan_to_markdown(scan_data: dict[str, Any]) -> str:
     hosts = scan_data.get("hosts", [])
     rows = []
     for host in hosts:
-        rows.append([
-            host.get("ip", ""),
-            host.get("status", "").upper(),
-            f"{host.get('latency_ms')} ms" if host.get("latency_ms") is not None else "-",
-            host.get("hostname") or "-",
-        ])
+        rows.append(
+            [
+                host.get("ip", ""),
+                host.get("status", "").upper(),
+                f"{host.get('latency_ms')} ms" if host.get("latency_ms") is not None else "-",
+                host.get("hostname") or "-",
+            ]
+        )
     lines.append(_table(["IP", "Status", "Latency", "Hostname"], rows))
     lines.append("")
     lines.append(f"**Discovered:** {scan_data.get('discovered', len(hosts))}  ")

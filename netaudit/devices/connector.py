@@ -10,6 +10,7 @@ module. They are resolved, in order, from:
 3. A local .env file (loaded via python-dotenv if present)
 4. An interactive, hidden prompt (getpass)
 """
+
 from __future__ import annotations
 
 import getpass
@@ -134,9 +135,7 @@ def connect(
             f"Authentication failed for {credentials.username}@{host}"
         ) from exc
     except NetmikoTimeoutException as exc:
-        raise DeviceConnectionError(
-            f"Connection to {host}:{port} timed out"
-        ) from exc
+        raise DeviceConnectionError(f"Connection to {host}:{port} timed out") from exc
     except Exception as exc:  # noqa: BLE001 - surface real connection errors
         raise DeviceConnectionError(f"Failed to connect to {host}: {exc}") from exc
 
@@ -144,8 +143,14 @@ def connect(
 class device_session:
     """Context manager wrapping a Netmiko connection for safe cleanup."""
 
-    def __init__(self, host: str, device_type: str, credentials: DeviceCredentials,
-                 port: int = 22, timeout: float = 10.0):
+    def __init__(
+        self,
+        host: str,
+        device_type: str,
+        credentials: DeviceCredentials,
+        port: int = 22,
+        timeout: float = 10.0,
+    ):
         self.host = host
         self.device_type = device_type
         self.credentials = credentials

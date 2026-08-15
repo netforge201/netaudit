@@ -1,4 +1,5 @@
 """Line-based diffing between two device snapshots."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -60,9 +61,7 @@ def diff_snapshots(
         if old_content == new_content:
             continue
 
-        added, removed = diff_text(
-            old_content.splitlines(), new_content.splitlines()
-        )
+        added, removed = diff_text(old_content.splitlines(), new_content.splitlines())
         file_diff = FileDiff(label=label, added=added, removed=removed)
         result.file_diffs.append(file_diff)
 

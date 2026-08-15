@@ -1,6 +1,7 @@
 """Tests for netaudit.scanner.icmp - mocks the subprocess call so no
 real network access or root privileges are required.
 """
+
 from __future__ import annotations
 
 import subprocess

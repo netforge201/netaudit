@@ -1,6 +1,7 @@
 """Tests for netaudit.network.interfaces - runs against real psutil data
 for this machine (no network access or elevated privileges required).
 """
+
 from __future__ import annotations
 
 from netaudit.network.interfaces import list_interfaces

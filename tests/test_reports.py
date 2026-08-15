@@ -1,4 +1,5 @@
 """Tests for netaudit.reports (JSON/CSV/Markdown/HTML generation)."""
+
 from __future__ import annotations
 
 import json
@@ -16,12 +17,27 @@ from netaudit.reports.markdown import (
 SAMPLE_SCAN = {
     "target": "192.168.1.0/30",
     "hosts": [
-        {"ip": "192.168.1.1", "status": "up", "latency_ms": 1.2,
-         "hostname": "router.local", "mac": None, "vendor": None},
-        {"ip": "192.168.1.2", "status": "down", "latency_ms": None,
-         "hostname": None, "mac": None, "vendor": None},
+        {
+            "ip": "192.168.1.1",
+            "status": "up",
+            "latency_ms": 1.2,
+            "hostname": "router.local",
+            "mac": None,
+            "vendor": None,
+        },
+        {
+            "ip": "192.168.1.2",
+            "status": "down",
+            "latency_ms": None,
+            "hostname": None,
+            "mac": None,
+            "vendor": None,
+        },
     ],
-    "discovered": 2, "online": 1, "offline": 1, "duration_s": 0.5,
+    "discovered": 2,
+    "online": 1,
+    "offline": 1,
+    "duration_s": 0.5,
 }
 
 

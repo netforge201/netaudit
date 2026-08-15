@@ -1,4 +1,5 @@
 """'netaudit report' - convert a saved JSON result into another report format."""
+
 from __future__ import annotations
 
 import json
@@ -15,7 +16,9 @@ log = get_logger("commands.report")
 def report(
     input_file: str = typer.Argument(..., help="Path to a JSON file produced with --json"),
     format: str = typer.Option("html", "--format", help="Output format: json, csv, markdown, html"),
-    output: str = typer.Option(None, "--output", help="Output file path (default: reports/<name>.<ext>)"),
+    output: str = typer.Option(
+        None, "--output", help="Output file path (default: reports/<name>.<ext>)"
+    ),
 ):
     """Convert INPUT_FILE (JSON) into the requested report FORMAT."""
     from netaudit.reports.csv import write_csv_report

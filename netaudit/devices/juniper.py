@@ -1,4 +1,5 @@
 """Juniper Junos read-only command set."""
+
 from __future__ import annotations
 
 DEVICE_TYPE = "juniper_junos"

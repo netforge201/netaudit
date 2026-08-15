@@ -1,4 +1,5 @@
 """HTTP(S) reachability/latency checks using httpx."""
+
 from __future__ import annotations
 
 import time

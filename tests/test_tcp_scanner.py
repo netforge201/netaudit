@@ -1,6 +1,7 @@
 """Tests for netaudit.scanner.tcp - uses a real local TCP socket, no
 external network access required.
 """
+
 from __future__ import annotations
 
 import socket

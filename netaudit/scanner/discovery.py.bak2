@@ -169,75 +169,24 @@ def discover_mdns_names(timeout: float = 3.0) -> dict[str, str]:
 
 
 def resolve_hostname(ip: str) -> str | None:
-    """Resolve a host name using several local-network mechanisms.
-
-    Order:
-    1. SMB/NetBIOS on macOS
-    2. Reverse DNS
-    3. /etc/hosts
-    4. macOS Bonjour reverse lookup
-
-    Every external command has a strict timeout so discovery cannot hang.
-    """
-
-    # 1. SMB / NetBIOS.
-    # On macOS:
-    #   smbutil status 192.168.1.128
-    #
-    # can return:
-    #   Workgroup: WORKGROUP
-    #   Server: MACBOOKPRO-4FFC
-    if platform.system() == "Darwin":
-        smbutil = shutil.which("smbutil")
-
-        if smbutil:
-            try:
-                proc = subprocess.run(
-                    [smbutil, "status", ip],
-                    capture_output=True,
-                    text=True,
-                    timeout=1.5,
-                )
-
-                output = proc.stdout + proc.stderr
-
-                match = re.search(
-                    r"^\s*Server:\s*(.+?)\s*$",
-                    output,
-                    re.MULTILINE | re.IGNORECASE,
-                )
-
-                if match:
-                    hostname = match.group(1).strip()
-
-                    if hostname and hostname.lower() not in {
-                        ip.lower(),
-                        "unknown",
-                    }:
-                        return hostname
-            except (OSError, subprocess.SubprocessError):
-                pass
-
-    # 2. Reverse DNS.
+    """Resolve hostname using reverse DNS, /etc/hosts and macOS Bonjour."""
+    # 1. Standard reverse DNS.
     try:
         hostname = socket.gethostbyaddr(ip)[0]
-
         if hostname:
             return hostname.rstrip(".")
     except (socket.herror, socket.gaierror, OSError):
         pass
 
-    # 3. /etc/hosts.
+    # 2. /etc/hosts.
     try:
         with open("/etc/hosts", encoding="utf-8") as hosts_file:
             for line in hosts_file:
                 line = line.split("#", 1)[0].strip()
-
                 if not line:
                     continue
 
                 parts = line.split()
-
                 if len(parts) < 2 or parts[0] != ip:
                     continue
 
@@ -247,11 +196,7 @@ def resolve_hostname(ip: str) -> str | None:
     except OSError:
         pass
 
-    # 4. macOS Bonjour reverse lookup.
-    #
-    # This is deliberately only a fallback. We do NOT use
-    # "dns-sd -L <service>" here because that operation can wait
-    # indefinitely when the service disappears.
+    # 3. macOS Bonjour reverse lookup.
     if platform.system() == "Darwin":
         dns_sd = shutil.which("dns-sd")
 
@@ -261,29 +206,23 @@ def resolve_hostname(ip: str) -> str | None:
                     [dns_sd, "-x", ip],
                     capture_output=True,
                     text=True,
-                    timeout=1.5,
+                    timeout=2.0,
                 )
 
                 output = proc.stdout + proc.stderr
 
+                # Example:
+                # 192.168.1.133 -> MacBook-Pro.local.
                 patterns = (
-                    r"\b([A-Za-z0-9._-]+\.local)\.?\b",
-                    r"PTR\s+([A-Za-z0-9._-]+\.local)\.?",
-                    r"name\s+([A-Za-z0-9._-]+\.local)\.?",
+                    r"\s([A-Za-z0-9._-]+\.local\.)",
+                    r"PTR\s+([A-Za-z0-9._-]+\.local\.)",
+                    r"name\s+([A-Za-z0-9._-]+\.local\.)",
                 )
 
                 for pattern in patterns:
-                    match = re.search(
-                        pattern,
-                        output,
-                        re.IGNORECASE,
-                    )
-
+                    match = re.search(pattern, output, re.IGNORECASE)
                     if match:
-                        hostname = match.group(1).rstrip(".")
-
-                        if hostname:
-                            return hostname
+                        return match.group(1).rstrip(".")
             except (OSError, subprocess.SubprocessError):
                 pass
 

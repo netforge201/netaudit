@@ -1,4 +1,5 @@
 """Input validation helpers shared across NetAudit commands."""
+
 from __future__ import annotations
 
 import ipaddress

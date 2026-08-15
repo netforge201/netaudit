@@ -1,6 +1,7 @@
 """Tests for netaudit.devices.connector - mocks Netmiko entirely so no
 real SSH connections or credentials are needed.
 """
+
 from __future__ import annotations
 
 from unittest.mock import MagicMock, patch

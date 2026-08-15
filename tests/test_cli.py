@@ -3,6 +3,7 @@
 These exercise argument parsing, help text, and error handling end to
 end. Anything that would touch the real network is mocked.
 """
+
 from __future__ import annotations
 
 import re
@@ -103,11 +104,10 @@ def test_scan_options_after_argument_are_parsed(cli_runner):
     with patch("netaudit.scanner.discovery.scan_network") as mock_scan:
         from netaudit.scanner.discovery import ScanSummary
 
-        mock_scan.return_value = ScanSummary(hosts=[], discovered=0, online=0,
-                                              offline=0, duration_s=0.0)
-        result = cli_runner.invoke(
-            app, ["scan", "192.168.1.0/30", "--ports", "22,80", "--quiet"]
+        mock_scan.return_value = ScanSummary(
+            hosts=[], discovered=0, online=0, offline=0, duration_s=0.0
         )
+        result = cli_runner.invoke(app, ["scan", "192.168.1.0/30", "--ports", "22,80", "--quiet"])
         assert result.exit_code == 0
         # Confirm --ports was actually parsed and passed through (4th positional arg).
         _, _kwargs_or_args = mock_scan.call_args, mock_scan.call_args.args

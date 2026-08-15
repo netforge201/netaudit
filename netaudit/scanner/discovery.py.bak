@@ -6,7 +6,6 @@ from __future__ import annotations
 
 import ipaddress
 import platform
-import re
 import shutil
 import socket
 import subprocess
@@ -169,155 +168,15 @@ def discover_mdns_names(timeout: float = 3.0) -> dict[str, str]:
 
 
 def resolve_hostname(ip: str) -> str | None:
-    """Resolve a host name using several local-network mechanisms.
-
-    Order:
-    1. SMB/NetBIOS on macOS
-    2. Reverse DNS
-    3. /etc/hosts
-    4. macOS Bonjour reverse lookup
-
-    Every external command has a strict timeout so discovery cannot hang.
-    """
-
-    # 1. SMB / NetBIOS.
-    # On macOS:
-    #   smbutil status 192.168.1.128
-    #
-    # can return:
-    #   Workgroup: WORKGROUP
-    #   Server: MACBOOKPRO-4FFC
-    if platform.system() == "Darwin":
-        smbutil = shutil.which("smbutil")
-
-        if smbutil:
-            try:
-                proc = subprocess.run(
-                    [smbutil, "status", ip],
-                    capture_output=True,
-                    text=True,
-                    timeout=1.5,
-                )
-
-                output = proc.stdout + proc.stderr
-
-                match = re.search(
-                    r"^\s*Server:\s*(.+?)\s*$",
-                    output,
-                    re.MULTILINE | re.IGNORECASE,
-                )
-
-                if match:
-                    hostname = match.group(1).strip()
-
-                    if hostname and hostname.lower() not in {
-                        ip.lower(),
-                        "unknown",
-                    }:
-                        return hostname
-            except (OSError, subprocess.SubprocessError):
-                pass
-
-    # 2. Reverse DNS.
+    """Resolve a hostname using reverse DNS without blocking indefinitely."""
     try:
-        hostname = socket.gethostbyaddr(ip)[0]
+        hostname, _, _ = socket.gethostbyaddr(ip)
 
         if hostname:
             return hostname.rstrip(".")
+
     except (socket.herror, socket.gaierror, OSError):
         pass
-
-    # 3. /etc/hosts.
-    try:
-        with open("/etc/hosts", encoding="utf-8") as hosts_file:
-            for line in hosts_file:
-                line = line.split("#", 1)[0].strip()
-
-                if not line:
-                    continue
-
-                parts = line.split()
-
-                if len(parts) < 2 or parts[0] != ip:
-                    continue
-
-                for hostname in parts[1:]:
-                    if hostname:
-                        return hostname.rstrip(".")
-    except OSError:
-        pass
-
-    # 4. macOS Bonjour reverse lookup.
-    #
-    # This is deliberately only a fallback. We do NOT use
-    # "dns-sd -L <service>" here because that operation can wait
-    # indefinitely when the service disappears.
-    if platform.system() == "Darwin":
-        dns_sd = shutil.which("dns-sd")
-
-        if dns_sd:
-            try:
-                proc = subprocess.run(
-                    [dns_sd, "-x", ip],
-                    capture_output=True,
-                    text=True,
-                    timeout=1.5,
-                )
-
-                output = proc.stdout + proc.stderr
-
-                patterns = (
-                    r"\b([A-Za-z0-9._-]+\.local)\.?\b",
-                    r"PTR\s+([A-Za-z0-9._-]+\.local)\.?",
-                    r"name\s+([A-Za-z0-9._-]+\.local)\.?",
-                )
-
-                for pattern in patterns:
-                    match = re.search(
-                        pattern,
-                        output,
-                        re.IGNORECASE,
-                    )
-
-                    if match:
-                        hostname = match.group(1).rstrip(".")
-
-                        if hostname:
-                            return hostname
-            except (OSError, subprocess.SubprocessError):
-                pass
-
-    return None
-
-def _resolve_smb_hostname(ip: str, timeout: float = 2.0) -> str | None:
-    """Resolve a hostname through macOS SMB when available."""
-    if platform.system() != "Darwin":
-        return None
-
-    smbutil = shutil.which("smbutil")
-    if not smbutil:
-        return None
-
-    try:
-        proc = subprocess.run(
-            [smbutil, "status", ip],
-            capture_output=True,
-            text=True,
-            timeout=timeout,
-        )
-    except (OSError, subprocess.SubprocessError):
-        return None
-
-    output = proc.stdout + proc.stderr
-
-    # macOS smbutil normally reports:
-    # Server: MACBOOKPRO-4FFC
-    match = re.search(r"^Server:\s*(.+?)\s*$", output, re.MULTILINE)
-
-    if match:
-        hostname = match.group(1).strip()
-        if hostname:
-            return hostname
 
     return None
 
@@ -329,11 +188,14 @@ def probe_host(
     resolve_dns: bool = True,
     resolve_mac: bool = True,
 ) -> HostResult:
-    """Probe a single host: ICMP, DNS, MAC, ports and service hostname."""
+    """Probe a single host: ICMP reachability, optional DNS/MAC/ports."""
     result = quick_probe(ip, timeout=timeout)
 
     hostname = resolve_hostname(ip) if resolve_dns and result.reachable else None
 
+    # MAC lookup is best-effort. On macOS, Scapy may not have permission
+    # to access /dev/bpf*. Failure to resolve a MAC must never turn an
+    # otherwise reachable host into DOWN.
     mac = None
     if resolve_mac and result.reachable:
         try:
@@ -344,26 +206,9 @@ def probe_host(
     vendor = vendor_from_mac(mac)
 
     open_ports: list[PortResult] = []
-
     if result.reachable and ports:
-        scanned = scan_ports(
-            ip,
-            ports,
-            timeout=timeout,
-            workers=min(len(ports), 20),
-        )
+        scanned = scan_ports(ip, ports, timeout=timeout, workers=min(len(ports), 20))
         open_ports = [p for p in scanned if p.state == "open"]
-
-    # SMB hostname discovery must happen after port scanning because
-    # smbutil can be slow or time out on hosts without SMB.
-    if not hostname and result.reachable:
-        has_smb = any(p.port == 445 for p in open_ports)
-
-        if has_smb:
-            hostname = _resolve_smb_hostname(
-                ip,
-                timeout=min(timeout, 2.0),
-            )
 
     return HostResult(
         ip=ip,

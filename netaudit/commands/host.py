@@ -1,4 +1,5 @@
 """'netaudit host' - detailed information about a single host."""
+
 from __future__ import annotations
 
 import contextlib

@@ -1,4 +1,5 @@
 """Tests for netaudit.config.settings."""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -33,9 +34,7 @@ def test_load_yaml_config_invalid_yaml_returns_empty(tmp_path: Path):
 
 def test_load_settings_merges_yaml_overrides(tmp_path: Path):
     config_file = tmp_path / "config.yaml"
-    config_file.write_text(
-        "defaults:\n  timeout: 5\n  workers: 10\n"
-    )
+    config_file.write_text("defaults:\n  timeout: 5\n  workers: 10\n")
     settings = load_settings(config_file)
     assert settings.defaults.timeout == 5
     assert settings.defaults.workers == 10

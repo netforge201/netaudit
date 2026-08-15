@@ -1,4 +1,5 @@
 """Cisco IOS/IOS-XE read-only command set."""
+
 from __future__ import annotations
 
 DEVICE_TYPE = "cisco_ios"

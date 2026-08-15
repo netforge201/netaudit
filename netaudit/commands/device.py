@@ -1,4 +1,5 @@
 """'netaudit device' - connect to and query network devices via Netmiko."""
+
 from __future__ import annotations
 
 import typer
@@ -16,8 +17,10 @@ def connect(
     target: str = typer.Argument(..., help="Device IP address or hostname"),
     username: str | None = typer.Option(None, "--username", envvar="NETAUDIT_USERNAME"),
     password: str | None = typer.Option(
-        None, "--password", envvar="NETAUDIT_PASSWORD",
-        help="Discouraged on the command line; prefer env vars or the interactive prompt."
+        None,
+        "--password",
+        envvar="NETAUDIT_PASSWORD",
+        help="Discouraged on the command line; prefer env vars or the interactive prompt.",
     ),
     device_type: str = typer.Option("cisco_ios", "--device-type", help="Netmiko device_type"),
     port: int = typer.Option(22, "--port", help="SSH port"),
@@ -51,8 +54,7 @@ def connect(
         err_console.print(f"[bold red]Connection failed:[/bold red] {exc}")
         raise typer.Exit(code=3) from None
 
-    console.print(f"[bold green]Connected successfully[/bold green] to {target} "
-                  f"({device_type}).")
+    console.print(f"[bold green]Connected successfully[/bold green] to {target} ({device_type}).")
 
 
 @app.command("info")

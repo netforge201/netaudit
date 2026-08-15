@@ -6,6 +6,7 @@ Produces a weighted health score out of 100 based on pass/warn/fail
 results. Checks that could not be performed are excluded from
 scoring entirely, per project requirements (never fake results).
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -96,35 +97,46 @@ def run_device_checks(target: str, device_type: str, credentials) -> list[CheckR
                 down = [s for s in statuses if s.status != "up" and "admin" not in s.status]
                 if statuses:
                     if down:
-                        results.append(CheckResult(
-                            "Interfaces", CheckStatus.WARN,
-                            f"{len(down)} interface(s) down: " +
-                            ", ".join(s.name for s in down[:5])
-                        ))
+                        results.append(
+                            CheckResult(
+                                "Interfaces",
+                                CheckStatus.WARN,
+                                f"{len(down)} interface(s) down: "
+                                + ", ".join(s.name for s in down[:5]),
+                            )
+                        )
                     else:
-                        results.append(CheckResult(
-                            "Interfaces", CheckStatus.PASS,
-                            f"All {len(statuses)} interfaces up"
-                        ))
+                        results.append(
+                            CheckResult(
+                                "Interfaces", CheckStatus.PASS, f"All {len(statuses)} interfaces up"
+                            )
+                        )
                 else:
-                    results.append(CheckResult(
-                        "Interfaces", CheckStatus.SKIP, "Could not parse interface status"
-                    ))
+                    results.append(
+                        CheckResult(
+                            "Interfaces", CheckStatus.SKIP, "Could not parse interface status"
+                        )
+                    )
 
             if "interfaces" in info:
                 errors = parse_ios_interface_errors(info["interfaces"])
                 bad = [e for e in errors if e.input_errors or e.output_errors or e.crc_errors]
                 if errors:
                     if bad:
-                        results.append(CheckResult(
-                            "Interface errors", CheckStatus.WARN,
-                            f"Errors detected on {len(bad)} interface(s): " +
-                            ", ".join(e.name for e in bad[:5])
-                        ))
+                        results.append(
+                            CheckResult(
+                                "Interface errors",
+                                CheckStatus.WARN,
+                                f"Errors detected on {len(bad)} interface(s): "
+                                + ", ".join(e.name for e in bad[:5]),
+                            )
+                        )
                     else:
-                        results.append(CheckResult(
-                            "Interface errors", CheckStatus.PASS, "No interface errors detected"
-                        ))
+                        results.append(
+                            CheckResult(
+                                "Interface errors", CheckStatus.PASS, "No interface errors detected"
+                            )
+                        )
 
             # CPU / memory / uptime (best effort, IOS-specific)
             if "version" in info:
@@ -135,19 +147,25 @@ def run_device_checks(target: str, device_type: str, credentials) -> list[CheckR
             # Routing
             if "routes" in info:
                 if svc.has_default_route(info["routes"]):
-                    results.append(CheckResult("Default route", CheckStatus.PASS,
-                                                "Default route present"))
+                    results.append(
+                        CheckResult("Default route", CheckStatus.PASS, "Default route present")
+                    )
                 else:
-                    results.append(CheckResult("Default route", CheckStatus.WARN,
-                                                "No default route found"))
+                    results.append(
+                        CheckResult("Default route", CheckStatus.WARN, "No default route found")
+                    )
 
             # ARP
             if "arp" in info:
-                results.append(CheckResult(
-                    "ARP table", CheckStatus.PASS if info["arp"].strip() else CheckStatus.WARN,
-                    f"ARP table retrieved ({len(info['arp'].splitlines())} lines)"
-                    if info["arp"].strip() else "ARP table is empty"
-                ))
+                results.append(
+                    CheckResult(
+                        "ARP table",
+                        CheckStatus.PASS if info["arp"].strip() else CheckStatus.WARN,
+                        f"ARP table retrieved ({len(info['arp'].splitlines())} lines)"
+                        if info["arp"].strip()
+                        else "ARP table is empty",
+                    )
+                )
 
             # NTP - only attempt if IOS-family
             try:
@@ -169,16 +187,23 @@ def run_device_checks(target: str, device_type: str, credentials) -> list[CheckR
                 if bgp is not None:
                     total, established = bgp
                     if total == 0:
-                        results.append(CheckResult("BGP", CheckStatus.SKIP, "No BGP neighbors configured"))
+                        results.append(
+                            CheckResult("BGP", CheckStatus.SKIP, "No BGP neighbors configured")
+                        )
                     elif established < total:
-                        results.append(CheckResult(
-                            "BGP", CheckStatus.WARN,
-                            f"{total - established} of {total} BGP neighbor(s) down"
-                        ))
+                        results.append(
+                            CheckResult(
+                                "BGP",
+                                CheckStatus.WARN,
+                                f"{total - established} of {total} BGP neighbor(s) down",
+                            )
+                        )
                     else:
-                        results.append(CheckResult(
-                            "BGP", CheckStatus.PASS, f"All {total} BGP neighbor(s) established"
-                        ))
+                        results.append(
+                            CheckResult(
+                                "BGP", CheckStatus.PASS, f"All {total} BGP neighbor(s) established"
+                            )
+                        )
             except Exception:  # noqa: BLE001
                 pass  # BGP unsupported/unavailable on this platform - omit silently
 
@@ -189,27 +214,38 @@ def run_device_checks(target: str, device_type: str, credentials) -> list[CheckR
                 if ospf is not None:
                     total, full = ospf
                     if total == 0:
-                        results.append(CheckResult("OSPF", CheckStatus.SKIP, "No OSPF neighbors configured"))
+                        results.append(
+                            CheckResult("OSPF", CheckStatus.SKIP, "No OSPF neighbors configured")
+                        )
                     elif full < total:
-                        results.append(CheckResult(
-                            "OSPF", CheckStatus.WARN,
-                            f"{total - full} of {total} OSPF neighbor(s) not Full"
-                        ))
+                        results.append(
+                            CheckResult(
+                                "OSPF",
+                                CheckStatus.WARN,
+                                f"{total - full} of {total} OSPF neighbor(s) not Full",
+                            )
+                        )
                     else:
-                        results.append(CheckResult(
-                            "OSPF", CheckStatus.PASS, f"All {total} OSPF neighbor(s) Full"
-                        ))
+                        results.append(
+                            CheckResult(
+                                "OSPF", CheckStatus.PASS, f"All {total} OSPF neighbor(s) Full"
+                            )
+                        )
             except Exception:  # noqa: BLE001
                 pass  # OSPF unsupported/unavailable on this platform - omit silently
 
     except MissingDependencyError as exc:
         results.append(CheckResult("Device checks", CheckStatus.SKIP, str(exc)))
     except DeviceAuthenticationError as exc:
-        results.append(CheckResult("Device checks", CheckStatus.SKIP,
-                                    f"Skipped (authentication failed): {exc}"))
+        results.append(
+            CheckResult(
+                "Device checks", CheckStatus.SKIP, f"Skipped (authentication failed): {exc}"
+            )
+        )
     except DeviceConnectionError as exc:
-        results.append(CheckResult("Device checks", CheckStatus.SKIP,
-                                    f"Skipped (connection failed): {exc}"))
+        results.append(
+            CheckResult("Device checks", CheckStatus.SKIP, f"Skipped (connection failed): {exc}")
+        )
 
     return results
 

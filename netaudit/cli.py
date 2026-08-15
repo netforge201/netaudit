@@ -14,6 +14,7 @@ development. Commands that have genuine subcommands with no
 competing default argument (device, config) remain nested Typer
 sub-apps, since that pattern is unaffected by the issue.
 """
+
 from __future__ import annotations
 
 import sys
@@ -78,9 +79,7 @@ def _print_banner() -> None:
     banner.append(f"  v{__version__}\n", style="dim")
     banner.append("Network Audit & Diagnostics Toolkit", style="italic")
     console.print(Panel(banner, expand=False, border_style="cyan"))
-    console.print(
-        "\n[bold]Usage:[/bold] netaudit [cyan]COMMAND[/cyan] [dim][OPTIONS][/dim]\n"
-    )
+    console.print("\n[bold]Usage:[/bold] netaudit [cyan]COMMAND[/cyan] [dim][OPTIONS][/dim]\n")
     console.print("[bold]Commands:[/bold]")
     commands = [
         ("scan", "Discover live hosts on a network"),
@@ -141,7 +140,9 @@ def run() -> None:
     try:
         app()
     except ValidationError as exc:
-        err_console.print(f"[bold red]Error:[/bold red] {exc}", crop=False, overflow="ignore", no_wrap=True)
+        err_console.print(
+            f"[bold red]Error:[/bold red] {exc}", crop=False, overflow="ignore", no_wrap=True
+        )
         sys.exit(2)
     except KeyboardInterrupt:
         err_console.print("\n[yellow]Interrupted.[/yellow]")

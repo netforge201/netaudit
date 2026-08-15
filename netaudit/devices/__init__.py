@@ -1,4 +1,5 @@
 """Vendor-specific device command modules, dispatched by Netmiko device_type."""
+
 from __future__ import annotations
 
 from netaudit.devices import arista, cisco, generic, juniper

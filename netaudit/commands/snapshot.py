@@ -9,6 +9,7 @@ attempted, so 'netaudit snapshot list' would be silently parsed as
 subcommand. Using a --list flag instead avoids that ambiguity
 entirely. Verified against Click 8.3 directly.
 """
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -44,8 +45,7 @@ def snapshot(
 
     if target is None:
         err_console.print(
-            "[bold red]Error:[/bold red] TARGET is required "
-            "(or use 'netaudit snapshot --list')."
+            "[bold red]Error:[/bold red] TARGET is required (or use 'netaudit snapshot --list')."
         )
         raise typer.Exit(code=2)
 

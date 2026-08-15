@@ -1,4 +1,5 @@
 """CSV report generation for tabular data (e.g. scan results)."""
+
 from __future__ import annotations
 
 import csv

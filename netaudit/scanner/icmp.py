@@ -4,6 +4,7 @@ Uses the system ``ping`` binary rather than raw sockets so that the
 tool works without root privileges or elevated capabilities on most
 platforms (Linux ping binaries are typically setuid/setcap already).
 """
+
 from __future__ import annotations
 
 import platform
@@ -35,9 +36,7 @@ class PingResult:
 def _ping_binary() -> str:
     binary = shutil.which("ping")
     if not binary:
-        raise PingUnavailableError(
-            "The 'ping' system utility was not found on this machine."
-        )
+        raise PingUnavailableError("The 'ping' system utility was not found on this machine.")
     return binary
 
 
@@ -45,13 +44,29 @@ def _build_command(target: str, count: int, timeout: float, interval: float) -> 
     binary = _ping_binary()
     system = platform.system()
     if system == "Darwin":
-        return [binary, "-c", str(count), "-W", str(int(timeout * 1000)),
-                "-i", str(max(interval, 0.2)), target]
+        return [
+            binary,
+            "-c",
+            str(count),
+            "-W",
+            str(int(timeout * 1000)),
+            "-i",
+            str(max(interval, 0.2)),
+            target,
+        ]
     if system == "Windows":
         return [binary, "-n", str(count), "-w", str(int(timeout * 1000)), target]
     # Linux / other POSIX
-    return [binary, "-c", str(count), "-W", str(max(int(timeout), 1)),
-            "-i", str(max(interval, 0.2)), target]
+    return [
+        binary,
+        "-c",
+        str(count),
+        "-W",
+        str(max(int(timeout), 1)),
+        "-i",
+        str(max(interval, 0.2)),
+        target,
+    ]
 
 
 _TIME_RE = re.compile(r"time[=<]([\d.]+)\s*ms", re.IGNORECASE)
@@ -72,12 +87,11 @@ def ping(target: str, count: int = 4, timeout: float = 2.0, interval: float = 1.
         return PingResult(target, False, count, 0, 100.0, None, None, None, [], str(exc))
 
     try:
-        proc = subprocess.run(
-            cmd, capture_output=True, text=True, timeout=timeout * count + 5
-        )
+        proc = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout * count + 5)
     except subprocess.TimeoutExpired:
-        return PingResult(target, False, count, 0, 100.0, None, None, None, [],
-                           "ping command timed out")
+        return PingResult(
+            target, False, count, 0, 100.0, None, None, None, [], "ping command timed out"
+        )
     except OSError as exc:
         return PingResult(target, False, count, 0, 100.0, None, None, None, [], str(exc))
 
@@ -88,8 +102,10 @@ def ping(target: str, count: int = 4, timeout: float = 2.0, interval: float = 1.
     ttl = int(ttl_matches[0]) if ttl_matches else None
 
     loss_match = _LOSS_RE.search(output)
-    loss_pct = float(loss_match.group(1)) if loss_match else (
-        100.0 if received == 0 else round(100 * (1 - received / count), 1)
+    loss_pct = (
+        float(loss_match.group(1))
+        if loss_match
+        else (100.0 if received == 0 else round(100 * (1 - received / count), 1))
     )
 
     reachable = received > 0

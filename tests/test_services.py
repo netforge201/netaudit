@@ -1,4 +1,5 @@
 """Tests for netaudit.utils.services (well-known port/service data)."""
+
 from __future__ import annotations
 
 from netaudit.utils.services import COMMON_TCP_PORTS, service_name

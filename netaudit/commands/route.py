@@ -1,4 +1,5 @@
 """'netaudit route' - traceroute to a target."""
+
 from __future__ import annotations
 
 import typer

@@ -3,6 +3,7 @@
 All logging goes to stderr so that stdout stays clean for command
 output (important for use in shell pipelines and automation).
 """
+
 from __future__ import annotations
 
 import logging

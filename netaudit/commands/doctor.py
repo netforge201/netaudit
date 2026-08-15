@@ -1,4 +1,5 @@
 """'netaudit doctor' - comprehensive network/device health check."""
+
 from __future__ import annotations
 
 import typer
@@ -48,7 +49,8 @@ def doctor(
             err_console.print(f"[yellow]Warning:[/yellow] {exc}. Skipping device checks.")
 
     report = run_doctor(
-        target, timeout=timeout,
+        target,
+        timeout=timeout,
         device_type=device_type if device else None,
         credentials=credentials if device else None,
     )

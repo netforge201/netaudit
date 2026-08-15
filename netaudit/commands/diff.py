@@ -1,4 +1,5 @@
 """'netaudit diff' - compare two most recent device snapshots."""
+
 from __future__ import annotations
 
 from pathlib import Path

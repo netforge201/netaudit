@@ -1,4 +1,5 @@
 """'netaudit ports' - TCP port scanning against a single host."""
+
 from __future__ import annotations
 
 import typer
@@ -16,9 +17,7 @@ def ports(
     ports_opt: str | None = typer.Option(
         None, "--ports", help="Comma-separated ports, e.g. 22,80,443"
     ),
-    range_opt: str | None = typer.Option(
-        None, "--range", help="Port range, e.g. 1-1024"
-    ),
+    range_opt: str | None = typer.Option(None, "--range", help="Port range, e.g. 1-1024"),
     timeout: float = typer.Option(1.0, "--timeout", help="Per-port timeout in seconds"),
     workers: int = typer.Option(100, "--workers", help="Concurrent worker threads"),
     json_output: bool = typer.Option(False, "--json", help="Output as JSON"),
@@ -43,10 +42,14 @@ def ports(
     results = scan_ports(target, port_list, timeout=timeout, workers=workers)
 
     if json_output:
-        print_json({
-            "target": target,
-            "ports": [{"port": r.port, "state": r.state, "service": r.service} for r in results],
-        })
+        print_json(
+            {
+                "target": target,
+                "ports": [
+                    {"port": r.port, "state": r.state, "service": r.service} for r in results
+                ],
+            }
+        )
         return
 
     if csv_output:

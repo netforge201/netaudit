@@ -3,6 +3,7 @@ live device connection is available (CPU, memory, uptime, routing,
 ARP, NTP, BGP, OSPF). Cisco IOS-oriented; unmatched output is
 reported as unavailable rather than guessed.
 """
+
 from __future__ import annotations
 
 import re
@@ -76,20 +77,24 @@ def parse_bgp_summary(raw: str) -> tuple[int, int] | None:
     if "% invalid" in lowered or "% unknown" in lowered or "bgp not active" in lowered:
         return None
     lines = raw.splitlines()
-    neighbor_lines = [
-        line for line in lines
-        if re.match(r"^\d+\.\d+\.\d+\.\d+\s", line.strip())
-    ]
+    neighbor_lines = [line for line in lines if re.match(r"^\d+\.\d+\.\d+\.\d+\s", line.strip())]
     if not neighbor_lines:
         return None
-    established = sum(1 for line in neighbor_lines if not re.search(r"\bIdle\b|\bActive\b|\bConnect\b", line))
+    established = sum(
+        1 for line in neighbor_lines if not re.search(r"\bIdle\b|\bActive\b|\bConnect\b", line)
+    )
     return len(neighbor_lines), established
 
 
 def parse_ospf_neighbors(raw: str) -> tuple[int, int] | None:
     """Return (total_neighbors, full_neighbors) from 'show ip ospf neighbor'."""
     lowered = raw.lower()
-    if "% invalid" in lowered or "% unknown" in lowered or "ospf process" not in lowered and "neighbor id" not in lowered:
+    if (
+        "% invalid" in lowered
+        or "% unknown" in lowered
+        or "ospf process" not in lowered
+        and "neighbor id" not in lowered
+    ):
         return None
     lines = [line for line in raw.splitlines() if re.match(r"^\d+\.\d+\.\d+\.\d+\s", line.strip())]
     if not lines:
