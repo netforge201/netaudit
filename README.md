@@ -157,13 +157,13 @@ arp -an
 Entries such as:
 
 ```text
-? (192.168.1.1) at 90:3:2e:a2:d6:c0 on en0
+? (10.0.0.1) at 00:11:22:33:44:55 on en0
 ```
 
 are normalized to:
 
 ```text
-90:03:2e:a2:d6:c0
+00:11:22:33:44:55
 ```
 
 This is important because macOS may display some hexadecimal MAC octets using a single digit.
@@ -183,9 +183,9 @@ The preferred lookup uses the `manuf` database when available.
 Example:
 
 ```text
-6c:40:08:ac:4f:fc -> Apple
-c8:38:70:27:b6:af -> SamsungE
-e8:78:65:e1:3d:9f -> Apple
+00:11:22:33:44:55 -> ExampleVendor
+AA:BB:CC:DD:EE:FF -> ExampleVendor
+12:34:56:78:9A:BC -> ExampleVendor
 ```
 
 A built-in OUI fallback is also available for common vendors.
@@ -217,15 +217,15 @@ smbutil status <IP>
 For example:
 
 ```text
-Using IP address of 192.168.1.128: 192.168.1.128
+Using IP address of 10.0.0.20: 10.0.0.20
 Workgroup: WORKGROUP
-Server: MACBOOKPRO-4FFC
+Server: EXAMPLE-WORKSTATION
 ```
 
 NetAudit can extract:
 
 ```text
-MACBOOKPRO-4FFC
+EXAMPLE-WORKSTATION
 ```
 
 as the hostname.
@@ -904,6 +904,59 @@ NetAudit:
 
 ---
 
+---
+
+# Support NetForge
+
+<p align="center">
+  <strong>Like NetAudit?</strong><br>
+  Support the development of NetForge and future open-source network tools.
+</p>
+
+<p align="center">
+  Every contribution helps fund development, testing, maintenance and new features.
+</p>
+
+### Crypto Donations
+
+<table align="center">
+<tr>
+<td align="center" width="50%">
+
+### 💵 USDT
+
+**TRC-20**
+
+```text
+TYtLvfgG9szPoRUcNpsz3paYzynFmLS5Go
+```
+
+</td>
+<td align="center" width="50%">
+
+### 💎 TON
+
+**TON Network**
+
+```text
+UQDpx5wZ03QD5tCFT6fkhKGJ-LRFhAfn7hYohEUSNoJcv6JS
+```
+
+</td>
+</tr>
+</table>
+
+<p align="center">
+  <strong>⚠️ Verify the network before sending</strong><br>
+  <sub>USDT donations must be sent through TRC-20.</sub><br>
+  <sub>Using the wrong network may result in permanent loss of funds.</sub>
+</p>
+
+<p align="center">
+  <em>Thank you for supporting independent open-source development.</em>
+</p>
+
+
 # Development
 
 Clone the repository:
@@ -1061,3 +1114,305 @@ https://github.com/netforge201/netaudit
 Issues:
 
 https://github.com/netforge201/netaudit/issues
+
+
+---
+
+# 🇷🇺 Русская версия
+
+## Что такое NetAudit?
+
+**NetAudit** — консольный инструмент для аудита, диагностики и анализа компьютерных сетей.
+
+Он предназначен для сетевых инженеров, системных администраторов, специалистов по инфраструктуре, IT-support и студентов, изучающих сети и кибербезопасность.
+
+NetAudit позволяет обнаруживать хосты, проверять их доступность, измерять задержку, получать MAC-адреса и информацию о производителе, определять hostname, сканировать TCP-порты, выполнять DNS-запросы, трассировать маршруты, анализировать локальные интерфейсы и работать с поддерживаемыми сетевыми устройствами.
+
+Главный принцип проекта:
+
+> NetAudit показывает только реально полученные данные и не подменяет отсутствующую информацию догадками.
+
+## Возможности
+
+### Обнаружение сети
+
+- Сканирование CIDR-сетей.
+- Параллельное обнаружение хостов.
+- ICMP-проверка доступности.
+- Измерение latency.
+- Получение MAC-адресов.
+- Использование системной ARP-таблицы.
+- Поддержка macOS `arp`.
+- Поддержка Linux neighbor table.
+- Scapy как дополнительный механизм ARP.
+- Нормализация MAC-адресов.
+- Определение производителя по OUI.
+- Определение производителя через `manuf`.
+- Reverse DNS.
+- `/etc/hosts`.
+- SMB / NetBIOS на macOS.
+- Bonjour / mDNS на macOS.
+- TCP service discovery.
+- Дополнительное сканирование портов.
+
+### Диагностика
+
+- Ping.
+- Packet loss.
+- Latency.
+- TTL.
+- DNS.
+- Reverse DNS.
+- Traceroute.
+- Анализ интерфейсов.
+- TCP scanning.
+- HTTP/HTTPS checks.
+- Health diagnostics.
+
+### Сетевые устройства
+
+Поддерживается read-only работа с:
+
+```text
+Cisco IOS / IOS-XE
+Cisco NX-OS
+Cisco IOS-XR
+Juniper Junos
+Arista EOS
+Generic devices
+```
+
+Для подключения используется SSH/Netmiko.
+
+## Установка
+
+```bash
+git clone https://github.com/netforge201/netaudit.git
+cd netaudit
+./install.sh
+```
+
+Или:
+
+```bash
+pip install .
+```
+
+Для разработки:
+
+```bash
+pip install -e ".[dev]"
+```
+
+## Быстрый старт
+
+Сканирование сети:
+
+```bash
+netaudit scan 10.0.0.0/24
+```
+
+Сканирование с TCP-портами:
+
+```bash
+netaudit scan 10.0.0.0/24 --ports 22,80,443,445
+```
+
+JSON:
+
+```bash
+netaudit scan 10.0.0.0/24 --json
+```
+
+Информация о хосте:
+
+```bash
+netaudit host 10.0.0.1
+```
+
+Проверка портов:
+
+```bash
+netaudit ports 10.0.0.1 --range 1-1024
+```
+
+Ping:
+
+```bash
+netaudit ping 8.8.8.8
+```
+
+DNS:
+
+```bash
+netaudit dns example.com
+```
+
+Reverse DNS:
+
+```bash
+netaudit dns 8.8.8.8 --reverse
+```
+
+Traceroute:
+
+```bash
+netaudit route 8.8.8.8
+```
+
+Интерфейсы:
+
+```bash
+netaudit interfaces
+```
+
+Диагностика:
+
+```bash
+netaudit doctor 10.0.0.1
+```
+
+Информация о Cisco:
+
+```bash
+netaudit device info 10.0.0.1 --device-type cisco_ios
+```
+
+## MAC и Vendor
+
+На macOS NetAudit в первую очередь использует системную ARP-таблицу:
+
+```bash
+arp -an
+```
+
+MAC-адреса macOS могут отображаться с однозначными hex-октетами. NetAudit нормализует их до стандартного шестнадцатеричного формата.
+
+Например, синтетический пример:
+
+```text
+10.0.0.1 -> 00:11:22:33:44:55
+```
+
+Vendor определяется через базу `manuf` и встроенный OUI fallback.
+
+Если производитель неизвестен, NetAudit показывает:
+
+```text
+VENDOR: —
+```
+
+Это означает только то, что соответствие не было найдено.
+
+## Hostname
+
+NetAudit использует несколько источников:
+
+1. Reverse DNS.
+2. `/etc/hosts`.
+3. SMB / NetBIOS.
+4. Bonjour / mDNS на macOS.
+
+Hostname не всегда доступен. Это нормально для локальных сетей: устройство может отвечать на ICMP и иметь MAC-адрес, но не иметь PTR-записи или доступного имени.
+
+## macOS
+
+Для macOS используются системные инструменты:
+
+```text
+arp
+smbutil
+dns-sd
+```
+
+Некоторые Bonjour-запросы могут ждать ответ от сети. Поэтому NetAudit использует таймауты и не должен блокировать весь скан из-за одного устройства.
+
+## Конфигурация
+
+Основной конфигурационный файл:
+
+```text
+~/.netaudit/config.yaml
+```
+
+Пример:
+
+```yaml
+defaults:
+  timeout: 2
+  workers: 50
+
+scanner:
+  default_ports:
+    - 22
+    - 80
+    - 443
+    - 445
+
+reports:
+  directory: ./reports
+
+snapshots:
+  directory: ./snapshots
+```
+
+Также можно использовать переменные окружения с префиксом:
+
+```text
+NETAUDIT_*
+```
+
+## Безопасность
+
+NetAudit предназначен для авторизованного аудита.
+
+Инструмент:
+
+- не пытается эксплуатировать найденные сервисы;
+- не изменяет конфигурацию сетевых устройств;
+- использует read-only команды;
+- не должен сохранять credentials в отчётах;
+- ограничивает размер CIDR-сканирования;
+- сообщает об отсутствующих зависимостях и привилегиях;
+- не выдумывает MAC, hostname или vendor.
+
+> Используйте NetAudit только в сетях и системах, на аудит которых у вас есть разрешение.
+
+## Разработка
+
+```bash
+ruff check netaudit tests
+pytest -q
+```
+
+Type checking:
+
+```bash
+mypy netaudit
+```
+
+Coverage:
+
+```bash
+pytest --cov=netaudit
+```
+
+## Поддержать NetForge
+
+Если NetAudit оказался полезен, можно поддержать разработку проекта криптодонатом.
+
+### USDT — TRC-20
+
+```text
+TYtLvfgG9szPoRUcNpsz3paYzynFmLS5Go
+```
+
+### TON
+
+```text
+UQDpx5wZ03QD5tCFT6fkhKGJ-LRFhAfn7hYohEUSNoJcv6JS
+```
+
+Перед отправкой обязательно проверьте сеть. Для USDT используется именно **TRC-20**.
+
+Спасибо за поддержку независимой open-source разработки.
